@@ -32,49 +32,53 @@
 <script>
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = 'Untitled design (1).jpg'; 
+  img.src = 'Untitled design (1).jpg';
 
   const text = "Don't make me fall in love again if he won't be here next year. ";
-  const fontSize = 8; // smaller values = more detail
+  const fontSize = 8;
 
   const canvas = document.getElementById('offscreenCanvas');
   const ctx = canvas.getContext('2d');
   const output = document.getElementById('text-output');
 
   img.onload = () => {
-    const cols = Math.floor(window.innerWidth / fontSize);
-    const rows = Math.floor(window.innerHeight / fontSize);
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
 
-    canvas.width = cols;
-    canvas.height = rows;
-    // Maintain aspect ratio and center the image
-    const aspectRatio = img.width / img.height;
-    const canvasAspect = cols / rows;
-    let drawWidth = cols;
-    let drawHeight = rows;
-    let offsetX = 0;
-    let offsetY = 0;
+    const cols = Math.floor(screenWidth / fontSize);
+    const rows = Math.floor(screenHeight / fontSize);
 
-    if (aspectRatio > canvasAspect) {
-      drawHeight = rows;
-      drawWidth = Math.floor(rows * aspectRatio);
-      offsetX = Math.floor((cols - drawWidth) / 2);
+    canvas.width = screenWidth;
+    canvas.height = screenHeight;
+
+    const imgAspect = img.width / img.height;
+    const screenAspect = screenWidth / screenHeight;
+
+    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+
+    if (imgAspect > screenAspect) {
+      drawHeight = screenHeight;
+      drawWidth = img.width * (screenHeight / img.height);
+      offsetX = (screenWidth - drawWidth) / 2;
     } else {
-      drawWidth = cols;
-      drawHeight = Math.floor(cols / aspectRatio);
-      offsetY = Math.floor((rows - drawHeight) / 2);
+      drawWidth = screenWidth;
+      drawHeight = img.height * (screenWidth / img.width);
+      offsetY = (screenHeight - drawHeight) / 2;
     }
 
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
 
-    const imageData = ctx.getImageData(0, 0, cols, rows).data;
+    const imageData = ctx.getImageData(0, 0, screenWidth, screenHeight).data;
 
     let result = '';
     let textIndex = 0;
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const index = (y * cols + x) * 4;
+        const px = Math.floor(x * fontSize);
+        const py = Math.floor(y * fontSize);
+        const index = (py * screenWidth + px) * 4;
+
         const r = imageData[index];
         const g = imageData[index + 1];
         const b = imageData[index + 2];
@@ -90,6 +94,9 @@
     output.innerHTML = result;
   };
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
