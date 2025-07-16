@@ -35,5 +35,54 @@
   img.src = 'Untitled design (1) (1).jpg';
 
   const text = "I love you, Harshit";
-  const fontSize = 17
+  const fontSize = 17;
+  const charAspectRatio = 0.6; // Approximate width-to-height ratio of monospace font characters
+
+  const canvas = document.getElementById('offscreenCanvas');
+  const ctx = canvas.getContext('2d');
+  const output = document.getElementById('text-output');
+
+  img.onload = () => {
+    const cols = Math.floor(window.innerWidth / (fontSize * charAspectRatio));
+    const rows = Math.floor(window.innerHeight / fontSize);
+
+    canvas.width = cols;
+    canvas.height = rows;
+
+    ctx.drawImage(img, 0, 0, cols, rows);
+    const imageData = ctx.getImageData(0, 0, cols, rows).data;
+
+    let result = '';
+    let textIndex = 0;
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const index = (y * cols + x) * 4;
+        const r = imageData[index];
+        const g = imageData[index + 1];
+        const b = imageData[index + 2];
+
+        const char = text[textIndex % text.length];
+        textIndex++;
+
+        result += `<span style="color: rgb(${r}, ${g}, ${b})">${char}</span>`;
+      }
+      result += '\n';
+    }
+
+    output.innerHTML = result;
+  };
+
+  img.onerror = () => {
+    output.textContent = "Failed to load image. Please check the file path.";
+  };
+</script>
+
+</body>
+</html>
+
+
+</body>
+</html>
+
 
